@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: order-execution-engine
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MAX_CONCURRENT_ORDERS
+        value: 10
+      - key: ORDERS_PER_MINUTE
+        value: 100
+      - key: MAX_RETRIES
+        value: 3
+      - key: RAYDIUM_LATENCY_MS
+        value: 200
+      - key: METEORA_LATENCY_MS
+        value: 200
+      - key: EXECUTION_LATENCY_MS
+        value: 2500
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: order-execution-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: order-execution-db
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: order-execution-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: order-execution-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: order-execution-db
+          property: password
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: order-execution-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: order-execution-redis
+          property: port
+
+databases:
+  - name: order-execution-db
+    plan: free
+    databaseName: order_execution
+    user: order_user
+
+  - name: order-execution-redis
+    plan: free
+    ipAllowList: []
